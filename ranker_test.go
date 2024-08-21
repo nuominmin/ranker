@@ -70,12 +70,12 @@ func TestRanker_Empty(t *testing.T) {
 }
 
 func TestPriorityQueue(t *testing.T) {
-	pq := make(PriorityQueue[int], 0)
+	pq := make(priorityQueue[int], 0)
 	heap.Init(&pq)
 
-	heap.Push(&pq, item[int]{Value: 1, Score: decimal.NewFromInt(10)})
-	heap.Push(&pq, item[int]{Value: 2, Score: decimal.NewFromInt(20)})
-	heap.Push(&pq, item[int]{Value: 3, Score: decimal.NewFromInt(5)})
+	heap.Push(&pq, item[int]{value: 1, score: decimal.NewFromInt(10)})
+	heap.Push(&pq, item[int]{value: 2, score: decimal.NewFromInt(20)})
+	heap.Push(&pq, item[int]{value: 3, score: decimal.NewFromInt(5)})
 
 	if pq.Len() != 3 {
 		t.Fatalf("expected length 3, got %d", pq.Len())
@@ -83,8 +83,8 @@ func TestPriorityQueue(t *testing.T) {
 
 	minItem := heap.Pop(&pq).(item[int])
 
-	// 由于这是一个最小堆，最小的元素应该是 Score = 5 的那个
-	if !minItem.Score.Equal(decimal.NewFromInt(5)) {
-		t.Errorf("expected minimum score 5, got %d", minItem.Score)
+	// 由于这是一个最小堆，最小的元素应该是 score = 5 的那个
+	if !minItem.score.Equal(decimal.NewFromInt(5)) {
+		t.Errorf("expected minimum score 5, got %d", minItem.score)
 	}
 }
