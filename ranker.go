@@ -2,12 +2,13 @@ package ranker
 
 import (
 	"container/heap"
+	"github.com/shopspring/decimal"
 	"sort"
 )
 
 type item[T any] struct {
 	Value T
-	Score int64 // 排序依据的分数
+	Score decimal.Decimal // 排序依据的分数
 }
 
 type Ranker[T any] struct {
@@ -23,13 +24,16 @@ func NewRanker[T any](topN int) *Ranker[T] {
 }
 
 // Add 添加数据，并根据分数进行排序
-func (r *Ranker[T]) Add(score int64, value T) {
+func (r *Ranker[T]) Add(score decimal.Decimal, value T) {
 	if len(r.priorityQ) < r.topN {
 		heap.Push(&r.priorityQ, item[T]{
 			Value: value,
 			Score: score,
 		})
-	} else if score > r.priorityQ[0].Score {
+		return
+	}
+
+	if score.GreaterThan(r.priorityQ[0].Score) {
 		heap.Pop(&r.priorityQ)
 		heap.Push(&r.priorityQ, item[T]{
 			Value: value,
@@ -45,7 +49,7 @@ func (r *Ranker[T]) GetTopN() []T {
 
 	// 对副本进行排序
 	sort.Slice(pqCopy, func(i, j int) bool {
-		return pqCopy[i].Score > pqCopy[j].Score
+		return pqCopy[i].Score.GreaterThan(pqCopy[j].Score)
 	})
 
 	// 提取排序后的值
@@ -62,7 +66,7 @@ type PriorityQueue[T any] []item[T]
 func (pq *PriorityQueue[T]) Len() int { return len(*pq) }
 
 func (pq *PriorityQueue[T]) Less(i, j int) bool {
-	return (*pq)[i].Score < (*pq)[j].Score
+	return (*pq)[i].Score.LessThan((*pq)[j].Score)
 }
 
 func (pq *PriorityQueue[T]) Swap(i, j int) {

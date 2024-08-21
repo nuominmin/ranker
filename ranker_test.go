@@ -2,6 +2,7 @@ package ranker
 
 import (
 	"container/heap"
+	"github.com/shopspring/decimal"
 	"testing"
 )
 
@@ -9,11 +10,11 @@ func TestRanker_AddAndGetTopN(t *testing.T) {
 	r := NewRanker[int](3)
 
 	// 添加数据
-	r.Add(10, 1)
-	r.Add(20, 2)
-	r.Add(15, 3)
-	r.Add(25, 4)
-	r.Add(5, 5)
+	r.Add(decimal.NewFromInt(10), 1)
+	r.Add(decimal.NewFromInt(20), 2)
+	r.Add(decimal.NewFromInt(15), 3)
+	r.Add(decimal.NewFromInt(25), 4)
+	r.Add(decimal.NewFromInt(5), 5)
 
 	// 获取前N名
 	topItems := r.GetTopN()
@@ -36,8 +37,8 @@ func TestRanker_AddLessThanTopN(t *testing.T) {
 	r := NewRanker[int](3)
 
 	// 添加少量数据
-	r.Add(10, 1)
-	r.Add(20, 2)
+	r.Add(decimal.NewFromInt(10), 1)
+	r.Add(decimal.NewFromInt(20), 2)
 
 	// 获取前N名
 	topItems := r.GetTopN()
@@ -72,9 +73,9 @@ func TestPriorityQueue(t *testing.T) {
 	pq := make(PriorityQueue[int], 0)
 	heap.Init(&pq)
 
-	heap.Push(&pq, item[int]{Value: 1, Score: 10})
-	heap.Push(&pq, item[int]{Value: 2, Score: 20})
-	heap.Push(&pq, item[int]{Value: 3, Score: 5})
+	heap.Push(&pq, item[int]{Value: 1, Score: decimal.NewFromInt(10)})
+	heap.Push(&pq, item[int]{Value: 2, Score: decimal.NewFromInt(20)})
+	heap.Push(&pq, item[int]{Value: 3, Score: decimal.NewFromInt(5)})
 
 	if pq.Len() != 3 {
 		t.Fatalf("expected length 3, got %d", pq.Len())
@@ -83,7 +84,7 @@ func TestPriorityQueue(t *testing.T) {
 	minItem := heap.Pop(&pq).(item[int])
 
 	// 由于这是一个最小堆，最小的元素应该是 Score = 5 的那个
-	if minItem.Score != 5 {
+	if !minItem.Score.Equal(decimal.NewFromInt(5)) {
 		t.Errorf("expected minimum score 5, got %d", minItem.Score)
 	}
 }
